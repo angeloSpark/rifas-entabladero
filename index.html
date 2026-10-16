@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rifas y Sorteos — Entabladero</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-emerald-800 text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <span class="text-2xl">🎟️</span>
+        <span class="text-xl font-black tracking-wider">ENTABLADERO</span>
+      </div>
+      <nav class="flex items-center space-x-2">
+        <button onclick="switchView('public')" class="px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-semibold hover:bg-emerald-900 transition">Boletos</button>
+        <button onclick="switchView('check-status')" class="px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-semibold hover:bg-emerald-900 transition">Mi Folio</button>
+        <button onclick="switchView('admin-login')" class="bg-emerald-950 hover:bg-black px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-semibold text-amber-300 border border-emerald-700 transition">🔒 Admin</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
+
+    <!-- VISTA PÚBLICA DE COMPRA -->
+    <section id="view-public" class="space-y-6">
+      <!-- Banner / Config Info -->
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 grid md:grid-cols-3 gap-6 items-center">
+        <div class="md:col-span-2 space-y-3">
+          <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-300 uppercase tracking-wide">¡Gran Primer Sorteo en Efectivo!</span>
+          <h1 id="raffle-title" class="text-2xl md:text-3xl font-extrabold text-slate-800">Rifas y Sorteos entre Amigos Entabladero</h1>
+          <p id="raffle-desc" class="text-slate-600 text-sm">
+            🎯 <strong>Premio Principal:</strong> $6,000 pesos en efectivo.<br>
+            🎁 <strong>Bono por Pronto Pago:</strong> ¡Gana $1,000 pesos extra en la compra de 5 boletos o más!<br>
+            📺 Transmisión en vivo a través de Facebook el día del evento y premiación en vivo.
+          </p>
+          <div class="flex flex-wrap gap-4 text-xs font-semibold text-slate-500 pt-2 border-t">
+            <span>📅 Fecha del Sorteo: <strong class="text-emerald-700">Por definir (Pendiente)</strong></span>
+            <span>🎟️ Boletos totales: <strong class="text-slate-700">1,200</strong></span>
+            <span>💰 Costo por boleto: <strong class="text-emerald-700 font-bold text-base">$13 MXN</strong></span>
+          </div>
+        </div>
+        <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 text-center space-y-2">
+          <p class="text-xs text-emerald-800 font-semibold uppercase">Oportunidades LN</p>
+          <p class="text-3xl font-black text-emerald-700">50 Números</p>
+          <p class="text-xs text-slate-500">Asignados por cada boleto entre los 60,000 oficiales de la Lotería Nacional.</p>
+        </div>
+      </div>
+
+      <!-- BARRAS DE BÚSQUEDA Y RULETA -->
+      <div class="grid md:grid-cols-2 gap-4">
+        <!-- 1. Buscador de Boleto Específico -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+          <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+            <span>🔍</span>
+            <span>Buscar tu Boleto Específico</span>
+          </h3>
+          <p class="text-xs text-slate-500">Escribe el número exacto que deseas buscar en la cuadrícula.</p>
+          <div class="flex space-x-2">
+            <input type="text" id="direct-search-input" placeholder="Ej. 0125" maxlength="4" class="w-full border p-2 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500 font-bold tracking-widest text-center">
+            <button onclick="searchSpecificTicket()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">Localizar</button>
+          </div>
+        </div>
+
+        <!-- 2. Ruleta de la Suerte (Selección al Azar) -->
+        <div class="bg-emerald-900 text-white p-5 rounded-2xl shadow-sm space-y-3">
+          <h3 class="font-bold text-amber-300 text-sm flex items-center space-x-2">
+            <span>✨</span>
+            <span>Ruleta de la Suerte (Al Azar)</span>
+          </h3>
+          <p class="text-xs text-emerald-200">Elige cuántos boletos aleatorios deseas que el sistema te escoja:</p>
+          <div class="flex space-x-2 items-center">
+            <select id="random-count" class="w-full bg-emerald-950 border border-emerald-700 text-white p-2 rounded-xl text-sm outline-none">
+              <option value="1">1 Boleto</option>
+              <option value="2">2 Boletos</option>
+              <option value="3">3 Boletos</option>
+              <option value="5">5 Boletos (Aplica Bono)</option>
+              <option value="10">10 Boletos</option>
+              <option value="15">15 Boletos</option>
+              <option value="20">20 Boletos</option>
+            </select>
+            <button onclick="pickRandomTickets()" class="bg-amber-400 hover:bg-amber-500 text-slate-950 font-black px-4 py-2 rounded-xl text-xs transition whitespace-nowrap">¡Elegir al Azar! 🎲</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros rápidos de estado -->
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center">
+        <span class="text-xs font-semibold text-slate-600">Filtrar vista:</span>
+        <div class="flex flex-wrap gap-2 text-xs">
+          <button onclick="filterStatus('all')" class="px-3 py-1.5 rounded-lg border bg-slate-100 text-slate-700 font-medium hover:bg-slate-200">Todos</button>
+          <button onclick="filterStatus('available')" class="px-3 py-1.5 rounded-lg border bg-emerald-100 text-emerald-800 font-medium hover:bg-emerald-200">Disponibles</button>
+          <button onclick="filterStatus('sold')" class="px-3 py-1.5 rounded-lg border bg-red-100 text-red-800 font-medium hover:bg-red-200">Ocupados (Privados)</button>
+        </div>
+      </div>
+
+      <!-- Grid de Boletos -->
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div id="tickets-grid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-10 lg:grid-cols-12 gap-2 max-h-[500px] overflow-y-auto p-2">
+          <!-- Se renderiza por JS -->
+        </div>
+      </div>
+
+      <!-- Barra flotante / Resumen de selección -->
+      <div id="selection-bar" class="fixed bottom-4 left-1/2 -translate-x-1/2 w-11/12 max-w-2xl bg-slate-900 text-white p-4 rounded-2xl shadow-2xl flex justify-between items-center hidden z-50">
+        <div>
+          <p class="text-xs text-slate-400">Boletos seleccionados: <span id="selected-count" class="font-bold text-amber-300">0</span></p>
+          <p class="text-lg font-black text-emerald-400">Total: <span id="selected-total">$0</span> MXN</p>
+        </div>
+        <button onclick="openCheckoutModal()" class="bg-emerald-500 hover:bg-emerald-600 px-5 py-2.5 rounded-xl font-bold text-sm transition text-slate-950 flex items-center space-x-1">
+          <span>Apartar Boletos ➡️</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- MODAL DE COMPRA Y PAGO -->
+    <div id="modal-checkout" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
+        <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+        <h2 class="text-xl font-bold text-slate-800">Completar Apartado</h2>
+        <p class="text-xs text-slate-500">Tus boletos quedarán apartados durante **30 minutos**. Realiza tu transferencia o depósito y sube tu comprobante.</p>
+        
+        <form id="form-checkout" onsubmit="handleCheckoutSubmit(event)" class="space-y-3 text-sm">
+          <div>
+            <label class="block font-semibold text-slate-700 text-xs mb-1">Nombre Completo *</label>
+            <input type="text" id="buyer-name" required placeholder="Ej. María Pérez Gómez" class="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 text-xs mb-1">Teléfono / WhatsApp *</label>
+            <input type="tel" id="buyer-phone" required placeholder="Ej. 7842100111" class="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 text-xs mb-1">Estado de la República *</label>
+            <select id="buyer-state" required class="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+              <option value="">Selecciona tu estado...</option>
+              <option value="Veracruz">Veracruz</option>
+              <option value="Puebla">Puebla</option>
+              <option value="Jalisco">Jalisco</option>
+              <option value="CDMX">Ciudad de México</option>
+              <option value="Nuevo León">Nuevo León</option>
+              <option value="Otro">Otro Estado</option>
+            </select>
+          </div>
+
+          <!-- Datos Bancarios SPIN by OXXO -->
+          <div class="bg-emerald-50 p-3.5 rounded-xl border border-emerald-200 text-xs space-y-1.5">
+            <p class="font-bold text-emerald-900 text-sm">💳 Datos para Pago (SPIN by OXXO):</p>
+            <p>Titular: <strong class="text-slate-800">Angel Itiel Muñoz Cruz</strong></p>
+            <p>CLABE Interbancaria: <strong class="text-slate-800 select-all bg-white px-1.5 py-0.5 rounded border">728969000144526889</strong></p>
+            <p>Depósitos en OXXO (Tarjeta): <strong class="text-slate-800 select-all bg-white px-1.5 py-0.5 rounded border">4217 4701 4941 1197</strong></p>
+            <p class="text-emerald-800 pt-1">📞 Teléfono de contacto / Dudas: <strong>7842100111</strong></p>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 text-xs mb-1">Subir Comprobante de Pago (Foto o Captura)</label>
+            <input type="file" id="buyer-receipt" accept="image/*,.pdf" class="w-full text-xs text-slate-500 border rounded-lg p-1">
+          </div>
+          <div class="flex items-center space-x-2 text-xs pt-1">
+            <input type="checkbox" id="terms" required class="rounded text-emerald-600">
+            <label for="terms">Acepto las reglas de participación y el tiempo límite de pago de 30 mins.</label>
+          </div>
+          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition">Confirmar y Generar Folio</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- VISTA DE CONSULTA DE FOLIO -->
+    <section id="view-check-status" class="max-w-md mx-auto space-y-6 hidden">
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 text-center space-y-4">
+        <h2 class="text-xl font-bold text-slate-800">Consultar Estado de mi Boleto</h2>
+        <p class="text-xs text-slate-500">Ingresa tu folio privado (ej. RF-5482) para verificar si tu pago ya fue confirmado.</p>
+        <div class="flex space-x-2">
+          <input type="text" id="search-folio-input" placeholder="Ej. RF-1234" class="w-full border p-2.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500 uppercase">
+          <button onclick="checkFolioStatus()" class="bg-emerald-600 text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-emerald-700">Buscar</button>
+        </div>
+        <div id="folio-result" class="text-left text-xs space-y-2 pt-4 hidden border-t"></div>
+      </div>
+    </section>
+
+    <!-- PANEL DE ADMINISTRACIÓN -->
+    <section id="view-admin" class="space-y-6 hidden">
+      <div class="flex justify-between items-center bg-slate-900 text-white p-4 rounded-2xl">
+        <h2 class="text-lg font-bold flex items-center space-x-2">
+          <span>🛡️</span>
+          <span>Panel Admin — Rifas Entabladero</span>
+        </h2>
+        <button onclick="logoutAdmin()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300">Cerrar Sesión</button>
+      </div>
+
+      <!-- Dashboard Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <p class="text-xs text-slate-500 font-semibold">Total Boletos</p>
+          <p id="dash-total" class="text-2xl font-black text-slate-800">1,200</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <p class="text-xs text-slate-500 font-semibold">Disponibles</p>
+          <p id="dash-avail" class="text-2xl font-black text-emerald-600">0</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <p class="text-xs text-slate-500 font-semibold">Apartados</p>
+          <p id="dash-res" class="text-2xl font-black text-amber-600">0</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <p class="text-xs text-slate-500 font-semibold">Pagados</p>
+          <p id="dash-paid" class="text-2xl font-black text-blue-600">0</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <p class="text-xs text-slate-500 font-semibold">Ingreso Confirmado</p>
+          <p id="dash-income" class="text-2xl font-black text-emerald-700">$0 MXN</p>
+        </div>
+      </div>
+
+      <!-- Herramienta de Verificación del Ganador LN -->
+      <div class="bg-amber-50 p-6 rounded-2xl border border-amber-300 space-y-4">
+        <div class="flex items-center space-x-2">
+          <span class="text-xl">🏆</span>
+          <h3 class="text-base font-bold text-amber-900">Consulta y Validación de Boleto Ganador (Lotería Nacional)</h3>
+        </div>
+        <p class="text-xs text-amber-800">Introduce los 5 dígitos del Premio Mayor de la Lotería Nacional (00001 a 60000) para verificar qué boleto e identidad corresponde.</p>
+        <div class="flex gap-3">
+          <input type="text" id="ln-winning-number" placeholder="Ej. 56835" maxlength="5" class="border border-amber-300 p-2.5 rounded-xl text-sm font-bold w-48 text-center tracking-widest outline-none focus:ring-2 focus:ring-amber-500">
+          <button onclick="calculateWinnerLN()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm shadow-md transition">Buscar Ganador</button>
+        </div>
+        <div id="winner-result-box" class="bg-white p-4 rounded-xl border border-amber-200 hidden text-xs space-y-1"></div>
+      </div>
+
+      <!-- Tabla de Compradores y Pagos -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex justify-between items-center">
+          <h3 class="font-bold text-slate-800">Solicitudes y Comprobantes</h3>
+          <button onclick="exportToCSV()" class="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center space-x-1">
+            <span>📥 Exportar CSV</span>
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-100 text-slate-600 uppercase font-semibold">
+              <tr>
+                <th class="p-3">Folio</th>
+                <th class="p-3">Comprador</th>
+                <th class="p-3">Teléfono</th>
+                <th class="p-3">Boletos</th>
+                <th class="p-3">Total ($13 c/u)</th>
+                <th class="p-3">Estado</th>
+                <th class="p-3">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="admin-orders-table" class="divide-y text-slate-700">
+              <!-- JS Injected -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN LOGIN -->
+    <section id="view-admin-login" class="max-w-sm mx-auto space-y-4 hidden pt-12">
+      <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200 text-center space-y-4">
+        <span class="text-3xl">🔒</span>
+        <h2 class="text-xl font-bold text-slate-800">Panel Administrativo</h2>
+        <form onsubmit="handleAdminLogin(event)" class="space-y-3">
+          <input type="password" id="admin-pass" placeholder="Contraseña de administrador" class="w-full border p-2.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+          <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-sm hover:bg-emerald-700">Ingresar</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const TOTAL_TICKETS = 1200;
+    const TICKET_PRICE = 13;
+    const LN_UNIVERSE = 60000;
+
+    let tickets = JSON.parse(localStorage.getItem('ent_tickets')) || Array.from({length: TOTAL_TICKETS}, (_, i) => ({
+      id: String(i + 1).padStart(4, '0'),
+      status: 'available',
+      buyer: null,
+      folio: null
+    }));
+
+    let orders = JSON.parse(localStorage.getItem('ent_orders')) || [];
+    let selectedTickets = [];
+    let currentFilter = 'all';
+
+    function saveData() {
+      localStorage.setItem('ent_tickets', JSON.stringify(tickets));
+      localStorage.setItem('ent_orders', JSON.stringify(orders));
+    }
+
+    function renderGrid(filterType = currentFilter) {
+      currentFilter = filterType;
+      const grid = document.getElementById('tickets-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      tickets.forEach(t => {
+        if (filterType === 'available' && t.status !== 'available') return;
+        if (filterType === 'sold' && t.status === 'available') return;
+
+        const isSelected = selectedTickets.includes(t.id);
+        const btn = document.createElement('button');
+
+        let bg = 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100';
+        let displayText = t.id;
+
+        // Ocupados en rojo y sin número por privacidad
+        if (t.status === 'reserved' || t.status === 'paid') {
+          bg = 'bg-red-600 border-red-700 text-white cursor-not-allowed opacity-90 shadow-inner';
+          displayText = '🔒';
+        }
+
+        if (isSelected) {
+          bg = 'bg-amber-500 text-slate-950 font-black ring-4 ring-amber-300 scale-105 z-10';
+        }
+
+        btn.className = `p-2 rounded-lg border text-xs font-semibold transition text-center ${bg}`;
+        btn.innerText = displayText;
+
+        if (t.status === 'available') {
+          btn.onclick = () => toggleTicketSelection(t.id);
+        }
+        grid.appendChild(btn);
+      });
+    }
+
+    function searchSpecificTicket() {
+      const input = document.getElementById('direct-search-input');
+      if (!input || !input.value) return;
+      const val = input.value.trim().padStart(4, '0');
+      const ticket = tickets.find(t => t.id === val);
+      
+      if (!ticket) {
+        alert('El boleto no existe (debe ser entre 0001 y 1200).');
+        return;
+      }
+      if (ticket.status !== 'available') {
+        alert(`El boleto ${val} ya se encuentra ocupado / vendido.`);
+        return;
+      }
+
+      if (!selectedTickets.includes(val)) {
+        selectedTickets.push(val);
+      }
+      updateSelectionBar();
+      renderGrid();
+      alert(`¡Boleto ${val} seleccionado! Revisa la parte inferior para apartar.`);
+    }
+
+    function pickRandomTickets() {
+      const select = document.getElementById('random-count');
+      const count = parseInt(select ? select.value : '1', 10);
+      const ava
